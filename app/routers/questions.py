@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
-
 from app.core.database import get_db
 import app.models.questions as question_models
 import app.schemas.question as question_schemas
