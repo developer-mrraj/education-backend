@@ -27,7 +27,7 @@ import app.schemas.result_analytics as result_schemas
 import app.schemas.payment as payment_schemas
 
 # Import routers
-from app.routers import user
+from app.routers import otp_router, user
 from app.routers import exam
 from app.routers import category
 from app.routers import test
@@ -43,6 +43,7 @@ app = FastAPI()
 
 
 app.include_router(user.router)
+app.include_router(otp_router.router)
 app.include_router(exam.router)
 app.include_router(category.router)
 app.include_router(test.router)
