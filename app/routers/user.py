@@ -155,3 +155,5 @@ def delete_user(user_id: int, db: Session = Depends(get_db), current_user: dict 
 @router.get("/me")
 def read_current_user(current_user: dict = Depends(get_current_user)):
     return {"message": "This is a protected route", "user": current_user}
+
+
