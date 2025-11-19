@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 from app.core.database import engine, Base, get_db
 
 # Import routers
-from app.routers import otp_router, test_session_answer,user, user_statistics
+from app.models import sections
+from app.routers import otp_router, sections, test_session_answer,user, user_statistics
 from app.routers import main_exam
 from app.routers import sub_exam
 from app.routers import test_series
@@ -17,6 +18,7 @@ from app.routers import test_sessions
 from app.models.test_sessions import TestSession
 from app.models.test_session_answer import TestSessionAnswer
 from app.models.user_statistics import UserStatistics
+from app.models.sections import Section
 
 
 # Create FastAPI app instance
@@ -34,6 +36,7 @@ app.include_router(test_questions.router)
 app.include_router(test_sessions.router)
 app.include_router(test_session_answer.router)
 app.include_router(user_statistics.router)
+app.include_router(sections.router)
 
 # --- Auto-create tables at startup ---
 @app.on_event("startup")
