@@ -16,4 +16,4 @@ class TestSessionAnswer(Base):
 
     # relationships
     session = relationship("TestSession", back_populates="answers")
-    question = relationship("TestQuestion")
+    question = relationship("TestQuestion",back_populates="answers")

@@ -1,10 +1,9 @@
 
-# app/schemas/user_statistics.py
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
-# -------------------- Response Schema --------------------
+# -------------------- User Statistics Response --------------------
 class UserStatisticsResponse(BaseModel):
     id: int
     user_id: int
@@ -17,18 +16,14 @@ class UserStatisticsResponse(BaseModel):
     class Config:
         orm_mode = True
 
-# # -------------------- Create Schema (Optional) --------------------
-# class UserStatisticsCreate(BaseModel):
-#     user_id: int
-
+# -------------------- Create Schema --------------------
 class UserStatisticsCreate(BaseModel):
-    user_id: int
+    # user_id: int
     total_tests_attempted: int = 0
     total_questions_practiced: int = 0
     best_score: float = 0.0
     accuracy: float = 0.0
     last_test_date: Optional[datetime] = None
-
 
 # -------------------- Update Schema --------------------
 class UserStatisticsUpdate(BaseModel):
@@ -37,3 +32,16 @@ class UserStatisticsUpdate(BaseModel):
     best_score: Optional[float] = None
     accuracy: Optional[float] = None
     last_test_date: Optional[datetime] = None
+
+# -------------------- Session Statistics Response --------------------
+class SessionStatisticsResponse(BaseModel):
+    session_id: int
+    user_id: int
+    total_correct: int
+    total_wrong: int
+    total_unattempted: int
+    average_time: float
+    accuracy: float
+
+    class Config:
+        orm_mode = True

@@ -8,7 +8,7 @@ from typing import Optional
 # Base Schema
 # -------------------------
 class TestSeriesListBase(BaseModel):
-    sub_exam_id: int
+    # sub_exam_id: int
 
     series_number: int
     title: str

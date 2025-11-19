@@ -14,14 +14,8 @@ class TestSession(Base):
     started_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     completed_at = Column(DateTime, nullable=True)
 
-    total_questions = Column(Integer, nullable=False, default=0)
-    attempted = Column(Integer, nullable=False, default=0)
-    correct = Column(Integer, nullable=False, default=0)
-    wrong = Column(Integer, nullable=False, default=0)
-    score = Column(Float, nullable=False, default=0.0)
-    accuracy = Column(Float, nullable=False, default=0.0)
-
-    # relationships
+    
+ # relationships
     answers = relationship("TestSessionAnswer", back_populates="session", cascade="all, delete-orphan")
     user = relationship("User")
     test_series = relationship("TestSeriesList")

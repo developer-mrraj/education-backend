@@ -20,4 +20,9 @@ class TestSummary(Base):
 
     # Relationship if needed
     test_series = relationship("TestSeriesList", back_populates="summaries")
-    test_questions = relationship("TestQuestion", back_populates="summary", cascade="all, delete")
+    test_questions = relationship(
+    "TestQuestion",
+    back_populates="test_summary",
+    cascade="all, delete"
+)
+

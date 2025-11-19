@@ -1,5 +1,3 @@
-
-
 # app/routers/user_statistics.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func
@@ -8,9 +6,11 @@ from typing import List
 from datetime import datetime
 
 from app.core.database import get_db
+from app.models.test_session_answer import TestSessionAnswer
 from app.models.user_statistics import UserStatistics
 from app.models.test_sessions import TestSession
 from app.schemas.user_statistics import (
+    SessionStatisticsResponse,
     UserStatisticsResponse,
     UserStatisticsCreate,
     UserStatisticsUpdate
@@ -95,3 +95,32 @@ def delete_user_statistics(user_id: int, db: Session = Depends(get_db)):
     db.delete(stats)
     db.commit()
     return {"detail": "User statistics deleted successfully"}
+
+
+# -------------------- GET SESSION STATISTICS --------------------
+@router.get("/session/{session_id}", response_model=SessionStatisticsResponse)
+def get_session_statistics(session_id: int, db: Session = Depends(get_db)):
+    session_answers = db.query(TestSessionAnswer).filter(
+        TestSessionAnswer.session_id == session_id
+    ).all()
+
+    if not session_answers:
+        raise HTTPException(status_code=404, detail="No answers found for this session")
+
+    user_id = session_answers[0].user_id
+    total_correct = sum(1 for ans in session_answers if ans.is_correct)
+    total_attempted = sum(1 for ans in session_answers if ans.user_answer is not None)
+    total_wrong = total_attempted - total_correct
+    total_unattempted = len(session_answers) - total_attempted
+    average_time = sum(ans.time_taken for ans in session_answers if ans.time_taken is not None) / total_attempted if total_attempted > 0 else 0.0
+    accuracy = (total_correct / total_attempted) * 100 if total_attempted > 0 else 0.0
+
+    return SessionStatisticsResponse(
+        session_id=session_id,
+        user_id=user_id,
+        total_correct=total_correct,
+        total_wrong=total_wrong,
+        total_unattempted=total_unattempted,
+        average_time=average_time,
+        accuracy=accuracy
+    )

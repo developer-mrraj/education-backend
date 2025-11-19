@@ -8,7 +8,7 @@ from typing import Optional
 # Base Schema
 # -------------------------
 class SubExamBase(BaseModel):
-    main_exam_id: int
+    # main_exam_id: int
 
     title: str
     subtitle: Optional[str] = None
