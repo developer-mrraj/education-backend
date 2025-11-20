@@ -7,8 +7,7 @@ from datetime import datetime
 
 # When starting a session
 class TestSessionCreate(BaseModel):
-    user_id: int
-    test_series_id: int
+   pass
 
 
 # When ending a session

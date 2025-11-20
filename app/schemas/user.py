@@ -10,7 +10,6 @@ class UserCreate(BaseModel):
     name: str
     phone_no: str
     email: Optional[EmailStr] = None
-    google_id: Optional[str] = None
     password: str  # plain password
 
 # ----------------------
@@ -36,7 +35,6 @@ class UserResponse(BaseModel):
     name: str
     phone_no: str
     email: Optional[EmailStr]
-    google_id: Optional[str]
     password: str
     created_at: datetime
     is_active: int

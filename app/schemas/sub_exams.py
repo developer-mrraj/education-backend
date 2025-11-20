@@ -8,8 +8,6 @@ from typing import Optional
 # Base Schema
 # -------------------------
 class SubExamBase(BaseModel):
-    # main_exam_id: int
-
     title: str
     subtitle: Optional[str] = None
     # tagline: Optional[str] = None
@@ -52,6 +50,7 @@ class SubExamUpdate(BaseModel):
 # -------------------------
 class SubExamResponse(SubExamBase):
     id: int
+    main_exam_id: int 
 
     class Config:
         from_attributes = True

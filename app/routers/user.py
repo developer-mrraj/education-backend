@@ -64,7 +64,6 @@ def create_user(user: user_schemas.UserCreate, db: Session = Depends(get_db)):
         name=user.name,
         phone_no=user.phone_no,
         email=user.email,
-        google_id=user.google_id,
         password=hashed_password
     )
 

@@ -22,3 +22,5 @@ class TestSeriesList(Base):
     # Relationship
     sub_exam = relationship("SubExam", backref="test_series_list")
     summaries = relationship("TestSummary", back_populates="test_series", cascade="all, delete")
+     # relationship
+    test_sessions = relationship("TestSession", back_populates="test_series", cascade="all, delete-orphan")

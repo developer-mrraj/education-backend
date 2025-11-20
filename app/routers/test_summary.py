@@ -1,8 +1,12 @@
+
+
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 
 from app.models.test_summary import TestSummary
+from app.models.test_series import TestSeriesList
 from app.schemas.test_summary import (
     TestSummaryCreate,
     TestSummaryUpdate,
@@ -12,25 +16,46 @@ from app.schemas.test_summary import (
 router = APIRouter(prefix="/test-summary", tags=["Test Summary"])
 
 
-# ----------------------------------------------------
-# CREATE SUMMARY (Fix: calculate totals BEFORE commit)
-# ----------------------------------------------------
-@router.post("/", response_model=TestSummaryResponse)
-def create_summary(data: TestSummaryCreate, db: Session = Depends(get_db)):
+# # ----------------------------------------------------
+# # CREATE SUMMARY (Auto-track latest test_series_id)
+# # ----------------------------------------------------
+# @router.post("/", response_model=TestSummaryResponse)
+# def create_summary(data: TestSummaryCreate, db: Session = Depends(get_db)):
+#     latest_series = db.query(TestSeriesList).order_by(TestSeriesList.id.desc()).first()
+#     if not latest_series:
+#         raise HTTPException(400, "No test series found to attach summary")
 
-    # STEP 1 → Fetch existing sections for this test series
+#     return create_summary_by_series_id(
+#         test_series_id=latest_series.id,
+#         data=data,
+#         db=db
+#     )
+
+
+# ----------------------------------------------------
+# CREATE SUMMARY BY test_series_id
+# ----------------------------------------------------
+@router.post("/by-series/{test_series_id}", response_model=TestSummaryResponse)
+def create_summary_by_series_id(test_series_id: int, data: TestSummaryCreate, db: Session = Depends(get_db)):
+
+    # Validate series exists
+    series = db.query(TestSeriesList).filter(TestSeriesList.id == test_series_id).first()
+    if not series:
+        raise HTTPException(status_code=404, detail="Test series not found")
+
+    # Fetch all existing sections for that test series
     existing_sections = db.query(TestSummary).filter(
-        TestSummary.test_series_id == data.test_series_id
+        TestSummary.test_series_id == test_series_id
     ).all()
 
-    # STEP 2 → Calculate totals INCLUDING the new section
+    # Calculate totals including the new section
     total_q = sum(s.questions for s in existing_sections) + data.questions
     total_m = sum(s.marks for s in existing_sections) + data.marks
     total_d = sum(s.duration for s in existing_sections) + data.duration
 
-    # STEP 3 → Insert NEW SECTION with pre-filled totals
+    # Insert new section
     new_section = TestSummary(
-        test_series_id=data.test_series_id,
+        test_series_id=test_series_id,
         section_name=data.section_name,
         questions=data.questions,
         marks=data.marks,
@@ -39,13 +64,14 @@ def create_summary(data: TestSummaryCreate, db: Session = Depends(get_db)):
         total_marks=total_m,
         total_duration=total_d,
     )
+
     db.add(new_section)
     db.commit()
     db.refresh(new_section)
 
-    # STEP 4 → Update TOTALS in ALL rows
+    # Update totals for ALL sections
     all_sections = db.query(TestSummary).filter(
-        TestSummary.test_series_id == data.test_series_id
+        TestSummary.test_series_id == test_series_id
     ).all()
 
     for sec in all_sections:
@@ -79,7 +105,7 @@ def get_summary(summary_id: int, db: Session = Depends(get_db)):
 
 
 # ----------------------------------------------------
-# UPDATE SUMMARY (Recalculate totals)
+# UPDATE SUMMARY
 # ----------------------------------------------------
 @router.put("/{summary_id}", response_model=TestSummaryResponse)
 def update_summary(summary_id: int, data: TestSummaryUpdate, db: Session = Depends(get_db)):
@@ -87,11 +113,9 @@ def update_summary(summary_id: int, data: TestSummaryUpdate, db: Session = Depen
     if not summary:
         raise HTTPException(404, "Summary not found")
 
-    # Update fields
     for key, value in data.dict(exclude_unset=True).items():
         setattr(summary, key, value)
 
-    # Recalculate totals for this test_series_id
     all_sections = db.query(TestSummary).filter(
         TestSummary.test_series_id == summary.test_series_id
     ).all()
@@ -100,7 +124,6 @@ def update_summary(summary_id: int, data: TestSummaryUpdate, db: Session = Depen
     total_m = sum(s.marks for s in all_sections)
     total_d = sum(s.duration for s in all_sections)
 
-    # update for all
     for sec in all_sections:
         sec.total_questions = total_q
         sec.total_marks = total_m

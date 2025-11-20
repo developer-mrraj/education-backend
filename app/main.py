@@ -19,6 +19,7 @@ from app.routers import test_sessions
 from app.models.test_sessions import TestSession
 from app.models.test_session_answer import TestSessionAnswer
 from app.models.user_statistics import UserStatistics
+from app.models.user import User
 # from app.models.sections import Section
 
 

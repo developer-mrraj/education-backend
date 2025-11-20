@@ -8,7 +8,7 @@ from typing import Optional
 # Base Schema
 # -------------------------
 class TestSeriesListBase(BaseModel):
-    # sub_exam_id: int
+  
 
     series_number: int
     title: str
@@ -44,6 +44,7 @@ class TestSeriesListUpdate(BaseModel):
 # -------------------------
 class TestSeriesListResponse(TestSeriesListBase):
     id: int
+    sub_exam_id: int
 
     class Config:
         from_attributes = True
