@@ -7,7 +7,7 @@ from app.core.database import engine, Base, get_db
 
 # Import routers
 # from app.models import sections
-from app.routers import otp_router,test_session_answer,user, user_statistics
+from app.routers import otp_router, test_series_by_names,test_session_answer,user, user_statistics
 from app.routers import main_exam
 from app.routers import sub_exam
 from app.routers import test_series
@@ -57,6 +57,7 @@ app.include_router(test_questions.router)
 app.include_router(test_sessions.router)
 app.include_router(test_session_answer.router)
 app.include_router(user_statistics.router)
+app.include_router(test_series_by_names.router)
 
 
 # --- Auto-create tables at startup ---
