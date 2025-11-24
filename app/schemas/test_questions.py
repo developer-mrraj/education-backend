@@ -2,7 +2,7 @@ from pydantic import BaseModel, constr
 from typing import Optional
 
 class TestQuestionBase(BaseModel):
-    # test_summary_id: int
+   
     question_text: str
     option_a: str
     option_b: str
@@ -25,6 +25,7 @@ class TestQuestionUpdate(BaseModel):
 
 class TestQuestionResponse(TestQuestionBase):
     id: int
+    test_summary_id: int
 
     class Config:
         orm_mode = True

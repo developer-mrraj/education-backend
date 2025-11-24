@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
+from app.models.sub_exams import SubExam
 from app.models.test_series import TestSeriesList
 from app.schemas.test_series import (
     TestSeriesListCreate, TestSeriesListUpdate, TestSeriesListResponse
@@ -16,6 +17,29 @@ def create_test_series(data: TestSeriesListCreate, db: Session = Depends(get_db)
     db.commit()
     db.refresh(series)
     return series
+
+# ---------------- CREATE TEST SERIES BY SUB_EXAM_ID ----------------
+@router.post("/by-sub/{sub_exam_id}", response_model=TestSeriesListResponse)
+def create_test_series_by_sub_id(sub_exam_id: int, data: TestSeriesListCreate, db: Session = Depends(get_db)):
+
+    # Check if sub exam exists
+    sub_exam = db.query(SubExam).filter(SubExam.id == sub_exam_id).first()
+    if not sub_exam:
+        raise HTTPException(status_code=404, detail="Sub exam not found")
+
+    series = TestSeriesList(
+        sub_exam_id=sub_exam_id,
+        series_number=data.series_number,
+        title=data.title,
+        duration_minutes=data.duration_minutes,
+        total_questions=data.total_questions,
+        is_active=data.is_active
+    )
+    db.add(series)
+    db.commit()
+    db.refresh(series)
+    return series
+
 
 
 @router.get("/", response_model=list[TestSeriesListResponse])

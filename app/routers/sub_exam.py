@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import get_db
+from app.models.main_exam import MainExam
 from app.models.sub_exams import SubExam
 from app.schemas.sub_exams import SubExamCreate, SubExamUpdate, SubExamResponse
 
@@ -15,7 +16,34 @@ def create_sub_exam(data: SubExamCreate, db: Session = Depends(get_db)):
     db.refresh(exam)
     return exam
 
+# ---------------- CREATE using specific main_exam_id ----------------
+@router.post("/by-main/{main_exam_id}", response_model=SubExamResponse)
+def create_sub_exam_by_main_id(main_exam_id: int, data: SubExamCreate, db: Session = Depends(get_db)):
 
+    # Check if main exam exists
+    main_exam = db.query(MainExam).filter(MainExam.id == main_exam_id).first()
+    if not main_exam:
+        raise HTTPException(status_code=404, detail="Main exam not found")
+
+    exam = SubExam(
+        main_exam_id=main_exam_id,
+        title=data.title,
+        subtitle=data.subtitle,
+        total_tests=data.total_tests,
+        thumbnail_url=data.thumbnail_url,
+        is_active=data.is_active
+    )
+    db.add(exam)
+    db.commit()
+    db.refresh(exam)
+    return exam
+
+
+# @router.get("/", response_model=list[SubExamResponse])
+# def get_all_sub_exams(db: Session = Depends(get_db)):
+#     return db.query(SubExam).all()
+
+# ---------------- GET all ----------------
 @router.get("/", response_model=list[SubExamResponse])
 def get_all_sub_exams(db: Session = Depends(get_db)):
     return db.query(SubExam).all()

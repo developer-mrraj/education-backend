@@ -6,7 +6,7 @@ from typing import Optional, List
 # Base Schema (Common fields)
 # --------------------------
 class TestSummaryBase(BaseModel):
-    # test_series_id: int
+   
     section_name: str
     questions: int
     marks: int
@@ -35,6 +35,7 @@ class TestSummaryUpdate(BaseModel):
 # --------------------------
 class TestSummaryResponse(TestSummaryBase):
     id: int
+    test_series_id: int
     total_questions: int
     total_marks: int
     total_duration: int
